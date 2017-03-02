@@ -20,11 +20,6 @@ function _arrayBufferToBase64( buffer ) {
 }
 
 socket.on('frame', function (data) {
-  // Reference: http://stackoverflow.com/questions/24107378/socket-io-began-to-support-binary-stream-from-1-0-is-there-a-complete-example-e/24124966#24124966
-  // var uint8Arr = new Uint8Array(data.buffer);
-  // var str = String.fromCharCode.apply(null, uint8Arr);
-  // var base64String = btoa(str);
-
   var base64String = _arrayBufferToBase64(data.buffer);
 
   img.onload = function () {
