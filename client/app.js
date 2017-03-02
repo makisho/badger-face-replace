@@ -9,11 +9,23 @@ var img = new Image();
 context.fillStyle = '#333';
 context.fillText('Loading...', canvas.width/2-30, canvas.height/3);
 
+function _arrayBufferToBase64( buffer ) {
+    var binary = '';
+    var bytes = new Uint8Array( buffer );
+    var len = bytes.byteLength;
+    for (var i = 0; i < len; i++) {
+        binary += String.fromCharCode( bytes[ i ] );
+    }
+    return window.btoa( binary );
+}
+
 socket.on('frame', function (data) {
   // Reference: http://stackoverflow.com/questions/24107378/socket-io-began-to-support-binary-stream-from-1-0-is-there-a-complete-example-e/24124966#24124966
-  var uint8Arr = new Uint8Array(data.buffer);
-  var str = String.fromCharCode.apply(null, uint8Arr);
-  var base64String = btoa(str);
+  // var uint8Arr = new Uint8Array(data.buffer);
+  // var str = String.fromCharCode.apply(null, uint8Arr);
+  // var base64String = btoa(str);
+
+  var base64String = _arrayBufferToBase64(data.buffer);
 
   img.onload = function () {
     context.drawImage(this, 0, 0, canvas.width, canvas.height);

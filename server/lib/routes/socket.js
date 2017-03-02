@@ -38,7 +38,7 @@ module.exports = function (socket) {
     camera.read(function(err, im) {
       if (err) throw err;
       var newSrc = new cv.Matrix(im.height(), im.width(), cv.Constants.CV_64FC4);
-      // cv.cvtColor(im, newSrc, cv.Constants.CV_BGRA2HSV);
+      im.copyTo(newSrc, 0, 0);
 
       im.detectObject('./node_modules/opencv/data/haarcascade_frontalface_alt_tree.xml', {}, function(err, faces) {
         if (err) throw err;
