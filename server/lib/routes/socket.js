@@ -1,8 +1,8 @@
 var cv = require('opencv');
 
 // camera properties
-var camWidth = 320;
-var camHeight = 240;
+var camWidth = 640;
+var camHeight = 480;
 var camFps = 10;
 var camInterval = 1000 / camFps;
 
@@ -21,7 +21,7 @@ cv.readImage('lib/images/badger.jpg', (err, mat) => {
 });
 var sallyRatio = sallyImg.height() / sallyImg.width();
 
-var makeSallies = () => {
+var makeScaledFaces = () => {
   var sallies = [];
   for (var i = 10; i < camWidth; i+= 10) {
     var resized = sallyImg.clone();
@@ -31,30 +31,49 @@ var makeSallies = () => {
   return sallies;
 }
 
+function copyNewFaces(newFaces, image) {
+  newFaces.map(({face, x, y}) => {
+    if ((y + face.height() < camHeight) && (x + face.width() < camWidth)) {
+      face.copyTo(image, x, y);
+    }
+  });
+  return image;
+}
+
 module.exports = function (socket) {
-  var sallies = makeSallies();
+  var scaledFaces = makeScaledFaces();
   console.log("MADE BADGERS");
+
+  var face_list = [];
+  var counter = 0;
+
   setInterval(function() {
     camera.read(function(err, im) {
       if (err) throw err;
-      var newSrc = new cv.Matrix(im.height(), im.width(), cv.Constants.CV_64FC4);
-      im.copyTo(newSrc, 0, 0);
+
+      var newImage = im;
+      var new_face_list = [];
 
       im.detectObject('./node_modules/opencv/data/haarcascade_frontalface_alt_tree.xml', {}, function(err, faces) {
         if (err) throw err;
-        for (var i = 0; i < faces.length; i++) {
-          face = faces[i];
-          if (face.height > 50) {
-            var sallyIndex = Math.floor(face.width / 10) - 1;
-            if (sallyIndex < 0) sallyIndex = 0;
-            if ((face.y + sallies[sallyIndex].height()) < camHeight) {
-              sallies[sallyIndex].copyTo(im, face.x, face.y);
-              // console.log(newSrc);
-            }
+
+        faces.map(face => {
+          if (face.height > 20) {
+            var newFaceIndex = Math.floor(face.width / 10) - 1;
+            if (newFaceIndex < 0) newFaceIndex = 0;
+            new_face_list.push({ face: scaledFaces[newFaceIndex], x: face.x, y: face.y });
           }
+        });
+
+        if (counter >= 5 && new_face_list.length > 0) {
+          face_list = new_face_list;
+          newImage = copyNewFaces(face_list, im);
+          counter = 0;
+          face_list = [];
         }
 
-        socket.emit('frame', { buffer: im.toBuffer() });
+        counter++;
+        socket.emit('frame', { buffer: newImage.toBuffer() });
       });
     });
   }, camInterval);
