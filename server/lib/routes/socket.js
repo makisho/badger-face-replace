@@ -1,9 +1,9 @@
 var cv = require('opencv');
 
 // camera properties
-var camWidth = 640;
-var camHeight = 480;
-var camFps = 10;
+var camWidth = 320 ;
+var camHeight = 240;
+var camFps = 5;
 var camInterval = 1000 / camFps;
 
 // face detection properties
@@ -31,50 +31,52 @@ var makeScaledFaces = () => {
   return sallies;
 }
 
-function copyNewFaces(newFaces, image) {
-  newFaces.map(({face, x, y}) => {
-    if ((y + face.height() < camHeight) && (x + face.width() < camWidth)) {
-      face.copyTo(image, x, y);
-    }
-  });
-  return image;
+function applyMask(mask, image, x, y) {
+  if ((y + mask.height() < camHeight) && (x + mask.width() < camWidth)) {
+    mask.copyTo(image, x, y);
+    return true;
+  }
+  return false;
+}
+
+function getMask(face, scaledFaces) {
+  var maskIndex = Math.floor(face.width / 10) - 1;
+  if (maskIndex < 0) maskIndex = 0;
+  return scaledFaces[maskIndex];
 }
 
 module.exports = function (socket) {
   var scaledFaces = makeScaledFaces();
   console.log("MADE BADGERS");
 
-  var face_list = [];
   var counter = 0;
-
+  var face_backup;
   setInterval(function() {
     camera.read(function(err, im) {
       if (err) throw err;
 
-      var newImage = im;
-      var new_face_list = [];
+      im = im.flip(1);
 
       im.detectObject('./node_modules/opencv/data/haarcascade_frontalface_alt_tree.xml', {}, function(err, faces) {
         if (err) throw err;
 
-        faces.map(face => {
-          if (face.height > 20) {
-            var newFaceIndex = Math.floor(face.width / 10) - 1;
-            if (newFaceIndex < 0) newFaceIndex = 0;
-            new_face_list.push({ face: scaledFaces[newFaceIndex], x: face.x, y: face.y });
-          }
-        });
-
-        if (counter >= 5 && new_face_list.length > 0) {
-          face_list = new_face_list;
-          newImage = copyNewFaces(face_list, im);
-          counter = 0;
-          face_list = [];
-        }
-
         counter++;
-        socket.emit('frame', { buffer: newImage.toBuffer() });
+        if (counter >= 2) {
+          face_backup = faces;
+          counter = 0;
+        }
+        faces = face_backup || faces;
+
+        faces.map(face => {
+            if (face.height > 20) {
+              var mask = getMask(face, scaledFaces);
+              applyMask(mask, im, face.x, face.y);
+            }
+          });
+
+        socket.emit('frame', { buffer: im.toBuffer() });
       });
+
     });
   }, camInterval);
 };
