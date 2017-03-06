@@ -14,7 +14,7 @@ var setOpts = (camWidth, camHeight, resizeFactor) => {
   RESIZE_FACTOR = resizeFactor;
 };
 
-var startCamera = () => {
+var start = () => {
   camera = new cv.VideoCapture(0);
   camera.setWidth(CAM_WIDTH);
   camera.setHeight(CAM_HEIGHT);
@@ -83,7 +83,7 @@ var getImage = (counter, detectedFaces) => {
 }
 
 module.exports = {
-  startCamera,
+  start,
   setOpts,
   getImage
 };
