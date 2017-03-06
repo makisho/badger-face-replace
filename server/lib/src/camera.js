@@ -6,6 +6,7 @@ var camera, maskImg, masks = [];
 var CAM_WIDTH = 1280;
 var CAM_HEIGHT = 720;
 var RESIZE_FACTOR = 5;
+var IS_RUNNING = false;
 
 var setOpts = (camWidth, camHeight, resizeFactor) => {
   CAM_WIDTH = camWidth;
@@ -20,9 +21,11 @@ var startCamera = () => {
 
   cv.readImage('lib/images/badger.jpg', (err, mat) => { maskImg = mat; });
   makeMasks(maskImg, maskImg.height() / maskImg.width());
+
+  IS_RUNNING = true;
 };
 
-var makeMasks = (maskImg, maskSizeRatio) => {
+function makeMasks(maskImg, maskSizeRatio) {
   for (var i = 10; i < CAM_WIDTH; i+= 10) {
     var resized = maskImg.clone();
     resized.resize(i, i * maskSizeRatio);
@@ -46,6 +49,8 @@ function getMask(face, masks) {
 
 var getImage = (counter, detectedFaces) => {
   return new Promise((resolve, reject) => {
+    if (!IS_RUNNING) reject("Please start the camera before attempting to get an image");
+
     camera.read(function(err, image) {
       if (err) reject(err);
 
@@ -62,7 +67,7 @@ var getImage = (counter, detectedFaces) => {
           detectedFaces = faces;
           counter = 0;
         }
-        
+
         faces = detectedFaces || faces;
         faces.map(face => {
           if (face.height > 10) {
@@ -79,6 +84,6 @@ var getImage = (counter, detectedFaces) => {
 
 module.exports = {
   startCamera,
-  makeMasks,
+  setOpts,
   getImage
 };
