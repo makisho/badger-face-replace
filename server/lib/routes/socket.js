@@ -1,9 +1,9 @@
 var camera = require('../src/camera');
 
-module.exports = function (socket) {
-  var camFps = 5;
-  var camInterval = 1000 / camFps;
+var CAM_FPS = 5;
+var CAM_INTERVAL = 1000 / CAM_FPS;
 
+function runCamera(socket) {
   camera.start();
 
   var counter = 0;
@@ -17,5 +17,9 @@ module.exports = function (socket) {
     }).catch(err => {
       console.log("Error:", err);
     });
-  }, camInterval);
+  }, CAM_INTERVAL);
+}
+
+module.exports = function (socket) {
+  socket.on('startCamera', () => { runCamera(socket); });
 };

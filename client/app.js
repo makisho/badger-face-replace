@@ -19,9 +19,18 @@ function _arrayBufferToBase64( buffer ) {
 
 socket.on('frame', function (data) {
   var base64String = _arrayBufferToBase64(data.buffer);
-
   img.onload = function () {
     context.drawImage(this, 0, 0, canvas.width, canvas.height);
   };
   img.src = 'data:image/png;base64,' + base64String;
 });
+
+function start() {
+  socket.emit('startCamera');
+}
+
+function stopCamera() {
+  socket.emit('stopCamera');
+}
+
+start();
