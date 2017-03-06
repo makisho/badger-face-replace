@@ -118,8 +118,10 @@ var saveGIF = (images, callback) => {
   saveFrames(images, GM, 0);
   images.reverse();
   saveFrames(images, GM, images.length);
-  GM.delay(200).write(path.resolve(__dirname, '../output/', 'animated.gif'), (err) => {
+  var gifPath = path.resolve(__dirname, '../../../client/output/', 'animated.gif');
+  GM.delay(200).write(gifPath, (err) => {
     if (err) console.log("ERROR:", err);
+    callback(gifPath);
   });
 };
 
