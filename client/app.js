@@ -1,11 +1,9 @@
-// MODIFY THIS TO THE APPROPRIATE URL IF IT IS NOT BEING RUN LOCALLY
 var socket = io.connect('http://localhost');
 
 var canvas = document.getElementById('canvas-video');
 var context = canvas.getContext('2d');
 var img = new Image();
 
-// show loading notice
 context.fillStyle = '#333';
 context.fillText('Loading...', canvas.width/2-30, canvas.height/3);
 

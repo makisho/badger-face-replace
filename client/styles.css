@@ -7,7 +7,15 @@
 }
 
 #canvas-video {
-  width: 1280px;
-  height: 960px;
+  width: 1280;
+  height: 720px;
   border: 1px solid #ccc;
+}
+
+#capture-button {
+  display: block;
+  font-size: 18px;
+  padding: 10px;
+  border-radius: 5px;
+  margin: 15px auto;
 }
