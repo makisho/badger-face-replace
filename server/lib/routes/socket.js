@@ -1,12 +1,17 @@
 var camera = require('../src/camera');
 
-var currentImage;
+var FPS = 5;
+var imageQueue = [];
+
+function addToQueue(item) {
+  if (imageQueue.length >= 5) imageQueue.shift();
+  imageQueue.push(item);
+}
 
 function runCamera(socket) {
-  var fps = 5;
   camera.start();
-  return camera.run(fps, (image) => {
-    currentImage = image;
+  return camera.run(FPS, (image) => {
+    addToQueue(image);
     socket.emit('frame', { buffer: image.toBuffer() });
   });
 }
@@ -19,7 +24,21 @@ module.exports = function (socket) {
     if (processID) {
       clearInterval(processID);
       camera.stop();
-      if (currentImage) camera.saveImage(currentImage);
+      if (imageQueue.length > 0) camera.saveImage(imageQueue[4]);
+    } else {
+      console.log("Error: camera is not running");
+    }
+  });
+
+  socket.on('takeVideo', () => {
+    if (processID) {
+      setTimeout(() => {
+        clearInterval(processID);
+        camera.stop();
+        if (imageQueue.length > 0) camera.saveGIF(imageQueue, (gifPath) => {
+          socket.emit('gif', { gifPath });
+        });
+      }, 1000 / FPS * 5);
     } else {
       console.log("Error: camera is not running");
     }

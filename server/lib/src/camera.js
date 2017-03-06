@@ -105,10 +105,29 @@ var run = (fps, callback) => {
   }, 1000 / fps);
 };
 
+var saveFrames = (images, gm, offset) => {
+  images.map((image, k) => {
+    var framePath = path.resolve(__dirname, '../output/', `output-00${offset + k}.jpg`);
+    image.save(path.resolve(framePath));
+    gm.in(framePath);
+  });
+}
+
+var saveGIF = (images, callback) => {
+  var GM = gm();
+  saveFrames(images, GM, 0);
+  images.reverse();
+  saveFrames(images, GM, images.length);
+  GM.delay(200).write(path.resolve(__dirname, '../output/', 'animated.gif'), (err) => {
+    if (err) console.log("ERROR:", err);
+  });
+};
+
 module.exports = {
   start,
   run,
   stop,
   getImage,
   saveImage,
+  saveGIF
 };
