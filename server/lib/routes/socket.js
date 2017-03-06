@@ -10,16 +10,11 @@ module.exports = function (socket) {
 
   badgerCam.startCamera();
 
-  var maskImg;
-  cv.readImage('lib/images/badger.jpg', (err, mat) => { maskImg = mat; });
-  var maskSizeRatio = maskImg.height() / maskImg.width();
-
-  var masks = badgerCam.makeMasks(maskImg, maskSizeRatio);
   var counter = 0;
   var face_backup;
 
   setInterval(function() {
-    badgerCam.getImage(masks, counter, face_backup).then(result => {
+    badgerCam.getImage(counter, face_backup).then(result => {
       counter = result.counter;
       face_backup = result.face_backup;
       socket.emit('frame', { buffer: result.image.toBuffer() });
