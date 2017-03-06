@@ -44,7 +44,7 @@ function getMask(face, masks) {
   return masks[maskIndex];
 }
 
-var getImage = (counter, face_backup) => {
+var getImage = (counter, detectedFaces) => {
   return new Promise((resolve, reject) => {
     camera.read(function(err, image) {
       if (err) reject(err);
@@ -59,11 +59,11 @@ var getImage = (counter, face_backup) => {
 
         counter++;
         if (counter >= 1) {
-          face_backup = faces;
+          detectedFaces = faces;
           counter = 0;
         }
-        faces = face_backup || faces;
-
+        
+        faces = detectedFaces || faces;
         faces.map(face => {
           if (face.height > 10) {
             var mask = getMask(face, masks);
@@ -71,7 +71,7 @@ var getImage = (counter, face_backup) => {
           }
         });
 
-        resolve({image, counter, face_backup});
+        resolve({image, counter, detectedFaces});
       });
     });
   });
