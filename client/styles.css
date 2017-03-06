@@ -35,8 +35,12 @@ button:disabled {
   background-image: url(icons/reload.png);
 }
 
-#capture {
+#picture {
   background-image: url(icons/photo-camera.png);
+}
+
+#video {
+  background-image: url(icons/video-camera.png);
 }
 
 #icon-credit {
