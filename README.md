@@ -1,8 +1,6 @@
-# face-detection-node-opencv
+# Badger Face Replace
 
-Real-time face detection using OpenCV, Node.js, and WebSockets.
-
-Click [here](http://youtu.be/v2SY0naPBFw) to see it in action.
+Replace your face with badgers (or whatever image you upload). Based on the [real-time face detection app](https://github.com/drejkim/face-detection-node-opencv) using OpenCV, Node.js, and WebSockets built by Esther Jun Kim.
 
 ## Requirements
 
@@ -14,6 +12,11 @@ Click [here](http://youtu.be/v2SY0naPBFw) to see it in action.
 
 * Navigate to the `server` directory
 * To install the packages: `npm install`
+
+## Replacing the mask image
+
+* Add your image (in JPEG format) to the `server/lib/images` directory
+* Update the `MASK_IMAGE` constant in `server/lib/config/camera.js`
 
 ## Running the demo
 
