@@ -8,7 +8,7 @@ module.exports = function (socket) {
   var camFps = 5;
   var camInterval = 1000 / camFps;
 
-  var camera = badgerCam.startCamera();
+  badgerCam.startCamera();
 
   var maskImg;
   cv.readImage('lib/images/badger.jpg', (err, mat) => { maskImg = mat; });
@@ -19,7 +19,7 @@ module.exports = function (socket) {
   var face_backup;
 
   setInterval(function() {
-    badgerCam.getImage(camera, masks, counter, face_backup).then(result => {
+    badgerCam.getImage(masks, counter, face_backup).then(result => {
       counter = result.counter;
       face_backup = result.face_backup;
       socket.emit('frame', { buffer: result.image.toBuffer() });
