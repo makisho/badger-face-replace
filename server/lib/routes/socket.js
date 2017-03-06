@@ -1,28 +1,13 @@
 var cv = require('opencv');
-
-// camera properties
-var camWidth = 1280;
-var camHeight = 720;
-var camFps = 5;
-var camInterval = 1000 / camFps;
+var badgerCam = require('../src/camera');
 
 // face detection properties
-var rectColor = [0, 255, 0];
-var rectThickness = 2;
 var resizeFactor = 4;
 
 // TODO: KEEP
-var camera = new cv.VideoCapture(0);
 var ALGORITHM_PATH = './node_modules/opencv/data/haarcascade_frontalface_alt_tree.xml';
 
-camera.setWidth(camWidth);
-camera.setHeight(camHeight);
-
-var maskImg;
-cv.readImage('lib/images/badger.jpg', (err, mat) => { maskImg = mat; });
-var maskSizeRatio = maskImg.height() / maskImg.width();
-
-var makemasks = () => {
+var makemasks = (maskImg, camWidth, maskSizeRatio) => {
   var masks = [];
   for (var i = 10; i < camWidth; i+= 10) {
     var resized = maskImg.clone();
@@ -32,7 +17,7 @@ var makemasks = () => {
   return masks;
 }
 
-function applyMask(mask, image, x, y) {
+function applyMask(mask, camHeight, camWidth, image, x, y) {
   if ((y + mask.height() < camHeight) && (x + mask.width() < camWidth)) {
     mask.copyTo(image, x, y);
     return true;
@@ -46,8 +31,8 @@ function getMask(face, masks) {
   return masks[maskIndex];
 }
 
-var getImage = (counter, face_backup) => {
-  var imagePromise = new Promise((resolve, reject) => {
+var getImage = (camera, masks, camHeight, camWidth, counter, face_backup) => {
+  return new Promise((resolve, reject) => {
     camera.read(function(err, image) {
       if (err) reject(err);
 
@@ -69,7 +54,7 @@ var getImage = (counter, face_backup) => {
         faces.map(face => {
           if (face.height > 10) {
             var mask = getMask(face, masks);
-            applyMask(mask, image, face.x * resizeFactor, face.y * resizeFactor);
+            applyMask(mask, camHeight, camWidth, image, face.x * resizeFactor, face.y * resizeFactor);
           }
         });
 
@@ -80,15 +65,28 @@ var getImage = (counter, face_backup) => {
 }
 
 module.exports = function (socket) {
-  var masks = makemasks();
+  var camWidth = 1280;
+  var camHeight = 720;
+  var camFps = 5;
+  var camInterval = 1000 / camFps;
 
+  var camera = badgerCam.makeCamera(camWidth, camHeight);
+
+  var maskImg;
+  cv.readImage('lib/images/badger.jpg', (err, mat) => { maskImg = mat; });
+  var maskSizeRatio = maskImg.height() / maskImg.width();
+
+  var masks = makemasks(maskImg, camWidth, maskSizeRatio);
   var counter = 0;
   var face_backup;
 
   setInterval(function() {
-    var result = getImage(counter, face_backup);
-    counter = result.counter;
-    face_backup = result.face_backup;
-    socket.emit('frame', { buffer: result.image.toBuffer() });
+    getImage(camera, masks, camHeight, camWidth, counter, face_backup).then(result => {
+      counter = result.counter;
+      face_backup = result.face_backup;
+      socket.emit('frame', { buffer: result.image.toBuffer() });
+    }).catch(err => {
+      console.log("ERR:", err);
+    });
   }, camInterval);
 };
