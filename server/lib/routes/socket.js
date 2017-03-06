@@ -1,38 +1,27 @@
 var camera = require('../src/camera');
 
-var CAM_FPS = 5;
-var CAM_INTERVAL = 1000 / CAM_FPS;
-
 var currentImage;
 
 function runCamera(socket) {
+  var fps = 5;
   camera.start();
-
-  var counter = 0;
-  var detectedFaces = [];
-
-  return setInterval(function() {
-    camera.getImage(counter, detectedFaces).then(result => {
-      counter = result.counter;
-      detectedFaces = result.detectedFaces;
-      currentImage = result.image;
-      socket.emit('frame', { buffer: currentImage.toBuffer() });
-    }).catch(err => {
-      console.log("Error:", err);
-    });
-  }, CAM_INTERVAL);
+  return camera.run(fps, (image) => {
+    currentImage = image;
+    socket.emit('frame', { buffer: image.toBuffer() });
+  });
 }
 
 module.exports = function (socket) {
   var processID;
   socket.on('startCamera', () => { processID = runCamera(socket); });
-  socket.on('stopCamera', () => {
+
+  socket.on('takePicture', () => {
     if (processID) {
       clearInterval(processID);
       camera.stop();
-      camera.saveImage(currentImage);
+      if (currentImage) camera.saveImage(currentImage);
     } else {
       console.log("Error: camera is not running");
     }
-  })
+  });
 };
