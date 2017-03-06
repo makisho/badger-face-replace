@@ -1,5 +1,6 @@
 var cv = require('opencv');
 var path = require('path');
+var gm = require('gm').subClass({ imageMagick: true });
 
 var {
   CAM_WIDTH,
@@ -90,9 +91,24 @@ var getImage = (counter, detectedFaces) => {
   });
 }
 
+var run = (fps, callback) => {
+  var counter = 0;
+  var detectedFaces = [];
+  return setInterval(() => {
+    getImage(counter, detectedFaces).then(result => {
+      counter = result.counter;
+      detectedFaces = result.detectedFaces;
+      callback(result.image);
+    }).catch(err => {
+      console.log("Error:", err);
+    });
+  }, 1000 / fps);
+};
+
 module.exports = {
   start,
+  run,
   stop,
   getImage,
-  saveImage
+  saveImage,
 };

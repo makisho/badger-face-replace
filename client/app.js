@@ -17,6 +17,7 @@ function _arrayBufferToBase64( buffer ) {
     return window.btoa( binary );
 }
 
+var currentImage;
 socket.on('frame', function (data) {
   var base64String = _arrayBufferToBase64(data.buffer);
   img.onload = function () {
@@ -33,8 +34,15 @@ function startCamera() {
 }
 
 function stopCamera() {
-  socket.emit('stopCamera');
+  socket.emit('takePicture');
   document.getElementById('start').disabled = false;
+  document.getElementById('picture').disabled = true;
+  document.getElementById('video').disabled = true;
+}
+
+function takeVideo() {
+  socket.emit('takeVideo');
+  document.getElementById('start').disabled = true;
   document.getElementById('picture').disabled = true;
   document.getElementById('video').disabled = true;
 }
