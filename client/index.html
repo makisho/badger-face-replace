@@ -8,7 +8,16 @@
 <body>
   <div class="container center">
     <canvas id="canvas-video" width="1280" height="720"></canvas>
-    <button id="capture-button" onClick="stopCamera()">Capture</button>
+    <div id="control-panel">
+      <button id="start" onClick="startCamera()" disabled="true" />
+      <button id="capture" onClick="stopCamera()" />
+    </div>
+  </div>
+  <div id="icon-credit">
+    Icons made by <a href="http://www.flaticon.com/authors/madebyoliver" title="Madebyoliver">Madebyoliver</a> and
+    <a href="http://www.flaticon.com/authors/gregor-cresnar" title="Gregor Cresnar">Gregor Cresnar</a> from
+    <a href="http://www.flaticon.com" title="Flaticon">www.flaticon.com</a> is licensed by
+    <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a>
   </div>
   <script src="/socket.io/socket.io.js"></script>
   <script src="/app.js"></script>

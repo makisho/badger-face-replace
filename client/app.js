@@ -25,12 +25,16 @@ socket.on('frame', function (data) {
   img.src = 'data:image/png;base64,' + base64String;
 });
 
-function start() {
+function startCamera() {
   socket.emit('startCamera');
+  document.getElementById('start').disabled = true;
+  document.getElementById('capture').disabled = false;
 }
 
 function stopCamera() {
   socket.emit('stopCamera');
+  document.getElementById('start').disabled = false;
+  document.getElementById('capture').disabled = true;
 }
 
-start();
+startCamera();
