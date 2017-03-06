@@ -1,25 +1,23 @@
 var cv = require('opencv');
+var path = require('path');
 
-var ALGORITHM_PATH = './node_modules/opencv/data/haarcascade_frontalface_alt_tree.xml';
+var {
+  CAM_WIDTH,
+  CAM_HEIGHT,
+  RESIZE_FACTOR,
+  MASK_IMAGE,
+  ALGORITHM_PATH
+} = require('../config/camera');
 
 var camera, maskImg, masks = [];
-var CAM_WIDTH = 1280;
-var CAM_HEIGHT = 720;
-var RESIZE_FACTOR = 5;
 var IS_RUNNING = false;
-
-var setOpts = (camWidth, camHeight, resizeFactor) => {
-  CAM_WIDTH = camWidth;
-  CAM_HEIGHT = camHeight;
-  RESIZE_FACTOR = resizeFactor;
-};
 
 var start = () => {
   camera = new cv.VideoCapture(0);
   camera.setWidth(CAM_WIDTH);
   camera.setHeight(CAM_HEIGHT);
 
-  cv.readImage('lib/images/badger.jpg', (err, mat) => { maskImg = mat; });
+  cv.readImage(path.resolve(__dirname, '../images/', MASK_IMAGE), (err, mat) => { maskImg = mat; });
   makeMasks(maskImg, maskImg.height() / maskImg.width());
 
   IS_RUNNING = true;
@@ -84,6 +82,5 @@ var getImage = (counter, detectedFaces) => {
 
 module.exports = {
   start,
-  setOpts,
   getImage
 };
