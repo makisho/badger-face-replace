@@ -11,12 +11,12 @@ module.exports = function (socket) {
   badgerCam.startCamera();
 
   var counter = 0;
-  var face_backup;
+  var detectedFaces = [];
 
   setInterval(function() {
-    badgerCam.getImage(counter, face_backup).then(result => {
+    badgerCam.getImage(counter, detectedFaces).then(result => {
       counter = result.counter;
-      face_backup = result.face_backup;
+      detectedFaces = result.detectedFaces;
       socket.emit('frame', { buffer: result.image.toBuffer() });
     }).catch(err => {
       console.log("ERR:", err);
