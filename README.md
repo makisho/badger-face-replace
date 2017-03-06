@@ -6,6 +6,8 @@ Replace your face with badgers (or whatever image you upload). Based on the [rea
 
 * [Node.js](http://nodejs.org/)
 * [OpenCV 2.4.x](http://opencv.org/)
+* [ImageMagick](https://www.imagemagick.org) – homebrew: `brew install imagemagick`
+* [GraphicsMagick](http://www.graphicsmagick.org/) – homebrew: `brew install graphicsmagick`
 * A webcam, e.g. laptop-integrated webcam, USB webcam
 
 ## Installing Node.js packages
