@@ -6,6 +6,7 @@ var {
   CAM_HEIGHT,
   RESIZE_FACTOR,
   MASK_IMAGE,
+  OUTPUT_IMAGE,
   ALGORITHM_PATH
 } = require('../config/camera');
 
@@ -27,6 +28,10 @@ var stop = () => {
   camera.release();
   IS_RUNNING = false;
 };
+
+var saveImage = (image) => {
+  image.save(path.resolve(__dirname, '../output/', OUTPUT_IMAGE));
+}
 
 function makeMasks(maskImg, maskSizeRatio) {
   for (var i = 10; i < CAM_WIDTH; i+= 10) {
@@ -88,5 +93,6 @@ var getImage = (counter, detectedFaces) => {
 module.exports = {
   start,
   stop,
-  getImage
+  getImage,
+  saveImage
 };

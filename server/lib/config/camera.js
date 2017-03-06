@@ -3,5 +3,6 @@ module.exports = {
   CAM_HEIGHT: 720,
   RESIZE_FACTOR: 5,
   MASK_IMAGE: 'badger.jpg',
+  OUTPUT_IMAGE: 'output.jpg',
   ALGORITHM_PATH: './node_modules/opencv/data/haarcascade_frontalface_alt_tree.xml'
 };
