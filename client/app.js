@@ -17,13 +17,16 @@ function _arrayBufferToBase64( buffer ) {
     return window.btoa( binary );
 }
 
-var currentImage;
 socket.on('frame', function (data) {
   var base64String = _arrayBufferToBase64(data.buffer);
   img.onload = function () {
     context.drawImage(this, 0, 0, canvas.width, canvas.height);
   };
   img.src = 'data:image/png;base64,' + base64String;
+});
+
+socket.on('gif', (data) => {
+
 });
 
 function startCamera() {
