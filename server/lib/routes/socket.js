@@ -7,16 +7,6 @@ var resizeFactor = 4;
 // TODO: KEEP
 var ALGORITHM_PATH = './node_modules/opencv/data/haarcascade_frontalface_alt_tree.xml';
 
-var makemasks = (maskImg, camWidth, maskSizeRatio) => {
-  var masks = [];
-  for (var i = 10; i < camWidth; i+= 10) {
-    var resized = maskImg.clone();
-    resized.resize(i, i * maskSizeRatio);
-    masks.push(resized);
-  }
-  return masks;
-}
-
 function applyMask(mask, camHeight, camWidth, image, x, y) {
   if ((y + mask.height() < camHeight) && (x + mask.width() < camWidth)) {
     mask.copyTo(image, x, y);
@@ -76,7 +66,7 @@ module.exports = function (socket) {
   cv.readImage('lib/images/badger.jpg', (err, mat) => { maskImg = mat; });
   var maskSizeRatio = maskImg.height() / maskImg.width();
 
-  var masks = makemasks(maskImg, camWidth, maskSizeRatio);
+  var masks = badgerCam.makeMasks(maskImg, camWidth, maskSizeRatio);
   var counter = 0;
   var face_backup;
 
