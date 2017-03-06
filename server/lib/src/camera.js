@@ -2,6 +2,7 @@ var cv = require('opencv');
 
 var ALGORITHM_PATH = './node_modules/opencv/data/haarcascade_frontalface_alt_tree.xml';
 
+var camera;
 var CAM_WIDTH = 1280;
 var CAM_HEIGHT = 720;
 var RESIZE_FACTOR = 5;
@@ -13,10 +14,9 @@ var setOpts = (camWidth, camHeight, resizeFactor) => {
 };
 
 var startCamera = () => {
-  var camera = new cv.VideoCapture(0);
+  camera = new cv.VideoCapture(0);
   camera.setWidth(CAM_WIDTH);
   camera.setHeight(CAM_HEIGHT);
-  return camera;
 };
 
 var makeMasks = (maskImg, maskSizeRatio) => {
@@ -43,7 +43,7 @@ function getMask(face, masks) {
   return masks[maskIndex];
 }
 
-var getImage = (camera, masks, counter, face_backup) => {
+var getImage = (masks, counter, face_backup) => {
   return new Promise((resolve, reject) => {
     camera.read(function(err, image) {
       if (err) reject(err);
