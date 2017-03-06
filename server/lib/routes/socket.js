@@ -9,7 +9,7 @@ function runCamera(socket) {
   var counter = 0;
   var detectedFaces = [];
 
-  setInterval(function() {
+  return setInterval(function() {
     camera.getImage(counter, detectedFaces).then(result => {
       counter = result.counter;
       detectedFaces = result.detectedFaces;
@@ -21,5 +21,14 @@ function runCamera(socket) {
 }
 
 module.exports = function (socket) {
-  socket.on('startCamera', () => { runCamera(socket); });
+  var processID;
+  socket.on('startCamera', () => { processID = runCamera(socket); });
+  socket.on('stopCamera', () => {
+    if (processID) {
+      clearInterval(processID);
+      camera.stop();
+    } else {
+      console.log("Error: camera is not running");
+    }
+  })
 };
