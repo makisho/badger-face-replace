@@ -28,13 +28,15 @@ socket.on('frame', function (data) {
 function startCamera() {
   socket.emit('startCamera');
   document.getElementById('start').disabled = true;
-  document.getElementById('capture').disabled = false;
+  document.getElementById('picture').disabled = false;
+  document.getElementById('video').disabled = false;
 }
 
 function stopCamera() {
   socket.emit('stopCamera');
   document.getElementById('start').disabled = false;
-  document.getElementById('capture').disabled = true;
+  document.getElementById('picture').disabled = true;
+  document.getElementById('video').disabled = true;
 }
 
 startCamera();
