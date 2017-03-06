@@ -7,6 +7,17 @@ var makeCamera = (camWidth, camHeight) => {
   return camera;
 };
 
+var makeMasks = (maskImg, camWidth, maskSizeRatio) => {
+  var masks = [];
+  for (var i = 10; i < camWidth; i+= 10) {
+    var resized = maskImg.clone();
+    resized.resize(i, i * maskSizeRatio);
+    masks.push(resized);
+  }
+  return masks;
+}
+
 module.exports = {
-  makeCamera
+  makeCamera,
+  makeMasks
 };
