@@ -1,34 +1,35 @@
 var cv = require('opencv');
 
 // camera properties
-var camWidth = 640;
-var camHeight = 480;
+var camWidth = 1280;
+var camHeight = 720;
 var camFps = 5;
 var camInterval = 1000 / camFps;
-var resizeFactor = 4;
+
 // face detection properties
 var rectColor = [0, 255, 0];
 var rectThickness = 2;
+var resizeFactor = 4;
 
-// initialize camera
+// TODO: KEEP
 var camera = new cv.VideoCapture(0);
+var ALGORITHM_PATH = './node_modules/opencv/data/haarcascade_frontalface_alt_tree.xml';
+
 camera.setWidth(camWidth);
 camera.setHeight(camHeight);
 
-var sallyImg;
-cv.readImage('lib/images/badger.jpg', (err, mat) => {
-  sallyImg = mat;
-});
-var sallyRatio = sallyImg.height() / sallyImg.width();
+var maskImg;
+cv.readImage('lib/images/badger.jpg', (err, mat) => { maskImg = mat; });
+var maskSizeRatio = maskImg.height() / maskImg.width();
 
-var makeScaledFaces = () => {
-  var sallies = [];
+var makemasks = () => {
+  var masks = [];
   for (var i = 10; i < camWidth; i+= 10) {
-    var resized = sallyImg.clone();
-    resized.resize(i, i * sallyRatio);
-    sallies.push(resized);
+    var resized = maskImg.clone();
+    resized.resize(i, i * maskSizeRatio);
+    masks.push(resized);
   }
-  return sallies;
+  return masks;
 }
 
 function applyMask(mask, image, x, y) {
@@ -39,29 +40,23 @@ function applyMask(mask, image, x, y) {
   return false;
 }
 
-function getMask(face, scaledFaces) {
+function getMask(face, masks) {
   var maskIndex = Math.floor(face.width * resizeFactor / 10) - 1;
   if (maskIndex < 0) maskIndex = 0;
-  return scaledFaces[maskIndex];
+  return masks[maskIndex];
 }
 
-module.exports = function (socket) {
-  var scaledFaces = makeScaledFaces();
-  console.log("MADE BADGERS");
+var getImage = (counter, face_backup) => {
+  var imagePromise = new Promise((resolve, reject) => {
+    camera.read(function(err, image) {
+      if (err) reject(err);
 
-  var counter = 0;
-  var face_backup;
-  setInterval(function() {
-    camera.read(function(err, im) {
-      if (err) throw err;
+      image = image.flip(1);
 
-      im = im.flip(1);
+      var newImage = image.copy();
+      newImage.resize(image.width()/resizeFactor, image.height()/resizeFactor);
 
-      var newIm = im.copy();
-      newIm.resize(im.width()/resizeFactor, im.height()/resizeFactor);
-
-      newIm.detectObject('./node_modules/opencv/data/haarcascade_frontalface_alt_tree.xml', {}, function(err, faces) {
-
+      newImage.detectObject(ALGORITHM_PATH, {}, function(err, faces) {
         if (err) throw err;
 
         counter++;
@@ -72,15 +67,28 @@ module.exports = function (socket) {
         faces = face_backup || faces;
 
         faces.map(face => {
-            if (face.height > 10) {
-              var mask = getMask(face, scaledFaces);
-              applyMask(mask, im, face.x * resizeFactor, face.y * resizeFactor);
-            }
-          });
+          if (face.height > 10) {
+            var mask = getMask(face, masks);
+            applyMask(mask, image, face.x * resizeFactor, face.y * resizeFactor);
+          }
+        });
 
-        socket.emit('frame', { buffer: im.toBuffer() });
+        resolve({image, counter, face_backup});
       });
-
     });
+  });
+}
+
+module.exports = function (socket) {
+  var masks = makemasks();
+
+  var counter = 0;
+  var face_backup;
+
+  setInterval(function() {
+    var result = getImage(counter, face_backup);
+    counter = result.counter;
+    face_backup = result.face_backup;
+    socket.emit('frame', { buffer: result.image.toBuffer() });
   }, camInterval);
 };
