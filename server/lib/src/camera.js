@@ -23,6 +23,11 @@ var start = () => {
   IS_RUNNING = true;
 };
 
+var stop = () => {
+  camera.release();
+  IS_RUNNING = false;
+};
+
 function makeMasks(maskImg, maskSizeRatio) {
   for (var i = 10; i < CAM_WIDTH; i+= 10) {
     var resized = maskImg.clone();
@@ -82,5 +87,6 @@ var getImage = (counter, detectedFaces) => {
 
 module.exports = {
   start,
+  stop,
   getImage
 };
