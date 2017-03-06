@@ -7,9 +7,15 @@
 }
 
 #canvas-video {
+  margin: auto;
   width: 1280;
   height: 720px;
   border: 1px solid #ccc;
+}
+
+#gif-block {
+  display: block;
+  margin: auto;
 }
 
 #control-panel {

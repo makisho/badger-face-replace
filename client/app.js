@@ -25,12 +25,34 @@ socket.on('frame', function (data) {
   img.src = 'data:image/png;base64,' + base64String;
 });
 
-socket.on('gif', (data) => {
+function hideElem(id) {
+  document.getElementById(id).style.display = 'none';
+}
 
+function showElem(id) {
+  document.getElementById(id).style.display = 'block';
+}
+
+socket.on('gif', (data) => {
+  var gifElem = document.getElementById('gif-block');
+  gifElem.src = '../output/animated.gif?' + new Date().getTime();;
+
+  hideElem('canvas-video');
+  showElem('gif-block');
+
+  document.getElementById('start').disabled = false;
 });
+
+function disableAllButtons() {
+  document.getElementById('start').disabled = true;
+  document.getElementById('picture').disabled = true;
+  document.getElementById('video').disabled = true;
+}
 
 function startCamera() {
   socket.emit('startCamera');
+  showElem('canvas-video');
+  hideElem('gif-block');
   document.getElementById('start').disabled = true;
   document.getElementById('picture').disabled = false;
   document.getElementById('video').disabled = false;
@@ -45,9 +67,7 @@ function stopCamera() {
 
 function takeVideo() {
   socket.emit('takeVideo');
-  document.getElementById('start').disabled = true;
-  document.getElementById('picture').disabled = true;
-  document.getElementById('video').disabled = true;
+  disableAllButtons();
 }
 
 startCamera();
