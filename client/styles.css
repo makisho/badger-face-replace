@@ -46,22 +46,3 @@ button {
 button:disabled {
   opacity: 0.2;
 }
-
-/*
-#start {
-  background-image: url(icons/reload.png);
-}
-
-#picture {
-  background-image: url(icons/photo-camera.png);
-}
-
-#video {
-  background-image: url(icons/video-camera.png);
-}
-
-#icon-credit {
-  position: absolute;
-  bottom: 0px;
-  margin: 0 0 10px 10px;
-}*/
