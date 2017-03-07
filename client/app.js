@@ -3,6 +3,7 @@ var socket = io.connect('http://localhost');
 var canvas = document.getElementById('canvas-video');
 var resultImg = document.getElementById('result-img');
 var loadingImg = document.getElementById('loading');
+var tweet = document.getElementById('twitter');
 
 var startButton = document.getElementById('start');
 var takePictureButton = document.getElementById('picture');
@@ -50,6 +51,7 @@ socket.on('showImage', (data) => {
   hideElem(loadingImg);
 
   enableButton(startButton);
+  showElem(twitter);
 });
 
 function disableAllButtons() {
@@ -64,6 +66,7 @@ function startCamera() {
   showElem(canvas);
   hideElem(loadingImg);
   hideElem(resultImg);
+  hideElem(twitter);
 
   disableButton(startButton);
   enableButton(takePictureButton);
