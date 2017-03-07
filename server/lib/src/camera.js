@@ -30,8 +30,10 @@ var stop = () => {
   IS_RUNNING = false;
 };
 
-var saveImage = (image) => {
-  image.save(path.resolve(__dirname, '../output/', OUTPUT_IMAGE));
+var saveImage = (image, callback) => {
+  var imgPath = path.resolve(__dirname, '../../../client/output', OUTPUT_IMAGE);
+  image.save(imgPath);
+  callback(OUTPUT_IMAGE);
 }
 
 function makeMasks(maskImg, maskSizeRatio) {
@@ -121,7 +123,7 @@ var saveGIF = (images, callback) => {
   var gifPath = path.resolve(__dirname, '../../../client/output/', 'animated.gif');
   GM.delay(200).write(gifPath, (err) => {
     if (err) console.log("ERROR:", err);
-    callback(gifPath);
+    callback('animated.gif');
   });
 };
 

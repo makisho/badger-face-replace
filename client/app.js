@@ -1,6 +1,11 @@
 var socket = io.connect('http://localhost');
 
 var canvas = document.getElementById('canvas-video');
+var resultImg = document.getElementById('result-img');
+var startButton = document.getElementById('start');
+var takePictureButton = document.getElementById('picture');
+var takeVideoButton = document.getElementById('video');
+
 var context = canvas.getContext('2d');
 var img = new Image();
 
@@ -25,44 +30,48 @@ socket.on('frame', function (data) {
   img.src = 'data:image/png;base64,' + base64String;
 });
 
-function hideElem(id) {
-  document.getElementById(id).style.display = 'none';
+function hideElem(elem) { elem.style.display = 'none'; }
+function showElem(elem) { elem.style.display = 'inline-block'; }
+
+function disableButton(button) {
+  button.disabled = true;
+  hideElem(button);
 }
 
-function showElem(id) {
-  document.getElementById(id).style.display = 'block';
+function enableButton(button) {
+  button.disabled = false;
+  showElem(button);
 }
 
-socket.on('gif', (data) => {
-  var gifElem = document.getElementById('gif-block');
-  gifElem.src = '../output/animated.gif?' + new Date().getTime();;
+socket.on('showImage', (data) => {
+  resultImg.src = '/output/' + data.imgPath + '?' + new Date().getTime();;
 
-  hideElem('canvas-video');
-  showElem('gif-block');
+  hideElem(canvas);
+  showElem(resultImg);
 
-  document.getElementById('start').disabled = false;
+  enableButton(startButton);
 });
 
 function disableAllButtons() {
-  document.getElementById('start').disabled = true;
-  document.getElementById('picture').disabled = true;
-  document.getElementById('video').disabled = true;
+  disableButton(startButton);
+  disableButton(takePictureButton);
+  disableButton(takeVideoButton);
 }
 
 function startCamera() {
   socket.emit('startCamera');
-  showElem('canvas-video');
-  hideElem('gif-block');
-  document.getElementById('start').disabled = true;
-  document.getElementById('picture').disabled = false;
-  document.getElementById('video').disabled = false;
+
+  showElem(canvas);
+  hideElem(resultImg);
+
+  disableButton(startButton);
+  enableButton(takePictureButton);
+  enableButton(takeVideoButton);
 }
 
-function stopCamera() {
+function takePicture() {
   socket.emit('takePicture');
-  document.getElementById('start').disabled = false;
-  document.getElementById('picture').disabled = true;
-  document.getElementById('video').disabled = true;
+  disableAllButtons();
 }
 
 function takeVideo() {

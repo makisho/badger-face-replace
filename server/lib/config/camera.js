@@ -1,6 +1,6 @@
 module.exports = {
-  CAM_WIDTH: 1280,
-  CAM_HEIGHT: 720,
+  CAM_WIDTH: 1920,
+  CAM_HEIGHT: 1080,
   RESIZE_FACTOR: 5,
   MASK_IMAGE: 'badger.jpg',
   OUTPUT_IMAGE: 'output.jpg',
