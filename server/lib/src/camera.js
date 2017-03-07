@@ -70,19 +70,25 @@ function createMaskOverlay(mask){
   }
 
   return {
-    src: mask,
-    height: maskHeight,
-    width: maskWidth,
     overlayImage: overlayImage,
     alphaMask: alphaMask,
   }
 }
 
 function makeMasks(maskImg, maskSizeRatio) {
+  var maskOverlay = createMaskOverlay(maskImg)
   for (var i = 10; i < CAM_WIDTH; i+= 10) {
-    var resized = maskImg.clone();
-    resized.resize(i, i * maskSizeRatio);
-    masks.push(createMaskOverlay(resized));
+    var resizedOverlay = maskOverlay.overlayImage.clone();
+    var resizedMask = maskOverlay.alphaMask.clone();
+    resizedOverlay.resize(i, i * maskSizeRatio);
+    resizedMask.resize(i, i * maskSizeRatio);
+
+    masks.push({
+      overlayImage: resizedOverlay,
+      alphaMask: resizedMask,
+      height: resizedOverlay.height(),
+      width: i
+    });
   }
 }
 
