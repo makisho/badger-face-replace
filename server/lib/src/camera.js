@@ -30,23 +30,81 @@ var stop = () => {
   IS_RUNNING = false;
 };
 
+function mergeAdd(pixel_a, pixel_b){
+  pixel_a[0] = pixel_a[0] + pixel_b[0];
+  pixel_a[1] = pixel_a[1] + pixel_b[1];
+  pixel_a[2] = pixel_a[2] + pixel_b[2];
+  return pixel_a;
+}
+function mergeMul(pixel_a, pixel_b){
+  pixel_a[0] = pixel_a[0] * pixel_b[0] / 255;
+  pixel_a[1] = pixel_a[1] * pixel_b[1] / 255;
+  pixel_a[2] = pixel_a[2] * pixel_b[2] / 255;
+  return pixel_a;
+}
+
 var saveImage = (image, callback) => {
   var imgPath = path.resolve(__dirname, '../../../client/output', OUTPUT_IMAGE);
   image.save(imgPath);
   callback(OUTPUT_IMAGE);
 }
 
+function createMaskOverlay(mask){
+  var maskHeight = mask.height();
+  var maskWidth = mask.width();
+  var overlayImage = new cv.Matrix(maskHeight, maskWidth);
+
+  var channels = mask.split();
+  var bgr = [channels[0], channels[1], channels[2]];
+  var alpha = channels[3];
+  alpha.cvtColor('CV_GRAY2BGR');
+
+  var alphaMask = channels[3].clone();
+  alphaMask.bitwiseNot(alphaMask);
+
+  overlayImage.merge(bgr);
+  for( x = 0; x < maskHeight; x++) {
+    for (y = 0; y < maskWidth; y++) {
+      overlayImage.pixel(y,x,mergeMul(overlayImage.pixel(y,x), alpha.pixel(y,x)));
+    }
+  }
+
+  return {
+    src: mask,
+    height: maskHeight,
+    width: maskWidth,
+    overlayImage: overlayImage,
+    alphaMask: alphaMask,
+  }
+}
+
 function makeMasks(maskImg, maskSizeRatio) {
   for (var i = 10; i < CAM_WIDTH; i+= 10) {
     var resized = maskImg.clone();
     resized.resize(i, i * maskSizeRatio);
-    masks.push(resized);
+    masks.push(createMaskOverlay(resized));
+  }
+}
+
+function overlayImages(base, mask, offset_x, offset_y){
+  for(x = 1; x < mask.width; x++){
+    for( y = 1; y < mask.height; y++){
+      base.pixel(y + offset_y,
+                 x + offset_x,
+                 mergeAdd(
+                   mergeMul(
+                     base.pixel(y + offset_y, x + offset_x),
+                     mask.alphaMask.pixel(y, x)
+                   ),
+                   mask.overlayImage.pixel(y,x)
+                 ))
+    }
   }
 }
 
 function applyMask(mask, image, x, y) {
-  if ((y + mask.height() < CAM_HEIGHT) && (x + mask.width() < CAM_WIDTH)) {
-    mask.copyTo(image, x, y);
+  if ((y + mask.height < CAM_HEIGHT) && (x + mask.width < CAM_WIDTH)) {
+    overlayImages(image, mask, x, y);
     return true;
   }
   return false;
