@@ -1,4 +1,5 @@
 var camera = require('../src/camera');
+var twitter = require('../src/twitter');
 
 var FPS = 5;
 var imageQueue = [];
@@ -47,5 +48,9 @@ module.exports = function (socket) {
     } else {
       console.log("Error: camera is not running");
     }
+  });
+
+  socket.on('tweet', (data) => {
+    twitter.tweet(data.user || '@redbadgerteam');
   });
 };
