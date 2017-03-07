@@ -2,15 +2,14 @@ var socket = io.connect('http://localhost');
 
 var canvas = document.getElementById('canvas-video');
 var resultImg = document.getElementById('result-img');
+var loadingImg = document.getElementById('loading');
+
 var startButton = document.getElementById('start');
 var takePictureButton = document.getElementById('picture');
 var takeVideoButton = document.getElementById('video');
 
 var context = canvas.getContext('2d');
 var img = new Image();
-
-context.fillStyle = '#333';
-context.fillText('Loading...', canvas.width/2-30, canvas.height/3);
 
 function _arrayBufferToBase64( buffer ) {
     var binary = '';
@@ -46,8 +45,9 @@ function enableButton(button) {
 socket.on('showImage', (data) => {
   resultImg.src = '/output/' + data.imgPath + '?' + new Date().getTime();;
 
-  hideElem(canvas);
   showElem(resultImg);
+  hideElem(canvas);
+  hideElem(loadingImg);
 
   enableButton(startButton);
 });
@@ -62,12 +62,21 @@ function startCamera() {
   socket.emit('startCamera');
 
   showElem(canvas);
+  hideElem(loadingImg);
   hideElem(resultImg);
 
   disableButton(startButton);
   enableButton(takePictureButton);
   enableButton(takeVideoButton);
 }
+
+function startLoading() {
+  showElem(loadingImg);
+  hideElem(resultImg);
+  hideElem(canvas);
+};
+
+socket.on('isLoading', startLoading);
 
 function takePicture() {
   socket.emit('takePicture');
@@ -79,4 +88,5 @@ function takeVideo() {
   disableAllButtons();
 }
 
+startLoading();
 startCamera();
