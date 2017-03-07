@@ -46,12 +46,11 @@ body {
 
 #control-panel {
   margin: auto;
+  position: relative;
+  bottom: 150px;
 }
 
 button {
-  position: relative;
-  bottom: 150px;
-
   width: 200px;
   height: 200px;
   padding: 10px;
@@ -67,4 +66,37 @@ button {
 
 button:disabled {
   opacity: 0.2;
+}
+
+#twitter {
+  position: relative;
+  bottom: 100px;
+  border: 2px solid #FC1D42;
+}
+
+#twitter span {
+  font-size: 24px;
+  padding: 15px;
+  padding-right: 0;
+}
+
+#twitter input {
+  border: none;
+  font-size: 24px;
+  padding: 15px 10px;
+  display: inline-block;
+  position: relative;
+}
+
+#twitter button {
+  border: none;
+  width: initial;
+  height: 100%;
+  border-radius: 0;
+  margin: 0;
+
+  font-size: 24px;
+  color: #F8F8F8;
+  background-color: #FC1D42;
+  padding: 15px 20px;
 }
