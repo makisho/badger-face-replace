@@ -91,5 +91,10 @@ function takeVideo() {
   disableAllButtons();
 }
 
+twitter.getElementsByTagName('form')[0].addEventListener('submit', (event) => {
+  event.preventDefault();
+  socket.emit('tweet', { user: event.target[0].value });
+});
+
 startLoading();
 startCamera();
