@@ -24,7 +24,9 @@ module.exports = function (socket) {
     if (processID) {
       clearInterval(processID);
       camera.stop();
-      if (imageQueue.length > 0) camera.saveImage(imageQueue[4]);
+      if (imageQueue.length > 0) camera.saveImage(imageQueue[4], (imgPath) => {
+        socket.emit('showImage', { imgPath });
+      });
     } else {
       console.log("Error: camera is not running");
     }
@@ -35,8 +37,8 @@ module.exports = function (socket) {
       setTimeout(() => {
         clearInterval(processID);
         camera.stop();
-        if (imageQueue.length > 0) camera.saveGIF(imageQueue, (gifPath) => {
-          socket.emit('gif', { gifPath });
+        if (imageQueue.length > 0) camera.saveGIF(imageQueue, (imgPath) => {
+          socket.emit('showImage', { imgPath });
         });
       }, 1000 / FPS * 5);
     } else {

@@ -4,23 +4,24 @@
   <meta name="viewport" content="initial-scale=1"/>
   <title>face-detection-node-opencv</title>
   <link rel="stylesheet" type="text/css" href="/styles.css">
+  <link href='http://fonts.googleapis.com/css?family=Bitter' rel='stylesheet' type='text/css'>
 </head>
 <body>
   <div class="container center">
-    <img id="gif-block">
-    <canvas id="canvas-video" width="1280" height="720"></canvas>
+    <img id="result-img">
+    <canvas id="canvas-video" width="1920" height="1080"></canvas>
     <div id="control-panel">
-      <button id="start" onClick="startCamera()" disabled="true" />
-      <button id="picture" onClick="stopCamera()" />
-      <button id="video" onClick="takeVideo()" />
+      <button id="start" onClick="startCamera()" disabled="true">GO AGAIN</button>
+      <button id="picture" onClick="takePicture()">PHOTO</button>
+      <button id="video" onClick="takeVideo()">GIF</button>
     </div>
   </div>
-  <div id="icon-credit">
+  <!-- <div id="icon-credit">
     Icons made by <a href="http://www.flaticon.com/authors/madebyoliver" title="Madebyoliver">Madebyoliver</a> and
     <a href="http://www.flaticon.com/authors/gregor-cresnar" title="Gregor Cresnar">Gregor Cresnar</a> from
     <a href="http://www.flaticon.com" title="Flaticon">www.flaticon.com</a> is licensed by
     <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a>
-  </div>
+  </div> -->
   <script src="/socket.io/socket.io.js"></script>
   <script src="/app.js"></script>
 </body>
