@@ -10,6 +10,26 @@ body {
   text-align: center;
 }
 
+@-webkit-keyframes rotate {
+  from { -webkit-transform: rotate(0deg); }
+  to { -webkit-transform: rotate(360deg); }
+}
+
+#loading {
+  width: 1920px;
+  height: 1080px;
+}
+
+#loading img {
+  height: 20%;
+  position: relative;
+  top: 30%;
+  -webkit-animation-name: rotate;
+  -webkit-animation-duration: 1s;
+  -webkit-animation-iteration-count: infinite;
+  -webkit-animation-timing-function: linear;
+}
+
 #canvas-video {
   margin: auto;
   width: 1920px;
@@ -20,6 +40,8 @@ body {
 #result-img {
   display: block;
   margin: auto;
+  width: 1280px;
+  height: 720px;
 }
 
 #control-panel {
