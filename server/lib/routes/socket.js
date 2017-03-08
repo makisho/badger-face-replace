@@ -51,7 +51,7 @@ module.exports = function (socket) {
   });
 
   socket.on('tweet', (data) => {
-    twitter.postImage(data.user || '@redbadgerteam', data.imagePath, () => {
+    twitter.postImage(data.userNames || '@redbadgerteam', data.imagePath, () => {
       socket.emit('tweetSent');
     });
   });

@@ -102,14 +102,29 @@ function takeVideo() {
   disableAllButtons();
 }
 
+function areValid(names) {
+  var valid = true;
+  names.split(' ').map(name => {
+    if (name[0] !== '@') valid = false;
+  });
+  return valid;
+}
+
 tweet.addEventListener('submit', (event) => {
   event.preventDefault();
   hideElem(tweet);
   showElem(tweetSpinner);
-  socket.emit('tweet', {
-    user: event.target[0].value,
-    imagePath: displayedImgPath
-  });
+
+  var userNames = event.target[0].value;
+  if (areValid(userNames)) {
+    socket.emit('tweet', {
+      userNames: userNames,
+      imagePath: displayedImgPath
+    });
+  } else {
+    showElem(tweet);
+    hideElem(tweetSpinner);
+  }
 });
 
 startLoading();
