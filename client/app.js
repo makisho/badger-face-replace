@@ -6,6 +6,7 @@ var loadingImg = document.getElementById('loading');
 var tweet = document.getElementById('tweet-submit');
 var tweetConfirmation = document.getElementById('tweet-confirmation')
 var tweetSpinner = document.getElementById('tweet-spinner');
+var tweetError = document.getElementById('twitter-error');
 var countdown = document.getElementById('countdown');
 
 var startButton = document.getElementById('start');
@@ -74,6 +75,7 @@ function startCamera() {
   hideElem(tweet);
   hideElem(tweetConfirmation);
   hideElem(tweetSpinner);
+  hideElem(tweetError);
 
   disableButton(startButton);
   enableButton(takePictureButton);
@@ -90,6 +92,7 @@ socket.on('isLoading', startLoading);
 
 socket.on('tweetSent', () => {
   hideElem(tweetSpinner);
+  hideElem(tweetError);
   showElem(tweetConfirmation);
 });
 
@@ -121,29 +124,27 @@ function takeVideo() {
   });
 }
 
-function areValid(names) {
-  var valid = true;
-  names.split(' ').map(name => {
-    if (name[0] !== '@') valid = false;
-  });
-  return valid;
+socket.on('twitterError', () => {
+  showElem(tweet);
+  showElem(tweetError);
+  hideElem(tweetSpinner);
+});
+
+function formatInput(input) {
+  var slicedInput = input.slice(0, -4);
+  return slicedInput === '<br>' ? slicedInput : input;
 }
 
 tweet.addEventListener('submit', (event) => {
   event.preventDefault();
   hideElem(tweet);
+  hideElem(tweetError);
   showElem(tweetSpinner);
 
-  var userNames = event.target[0].value;
-  if (areValid(userNames)) {
-    socket.emit('tweet', {
-      userNames: userNames,
-      imagePath: displayedImgPath
-    });
-  } else {
-    showElem(tweet);
-    hideElem(tweetSpinner);
-  }
+  socket.emit('tweet', {
+    handles: formatInput(event.target.children[1].innerHTML),
+    imagePath: displayedImgPath
+  });
 });
 
 startLoading();
