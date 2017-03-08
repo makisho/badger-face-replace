@@ -4,6 +4,7 @@ var canvas = document.getElementById('canvas-video');
 var resultImg = document.getElementById('result-img');
 var loadingImg = document.getElementById('loading');
 var tweet = document.getElementById('twitter');
+var countdown = document.getElementById('countdown');
 
 var startButton = document.getElementById('start');
 var takePictureButton = document.getElementById('picture');
@@ -81,14 +82,32 @@ function startLoading() {
 
 socket.on('isLoading', startLoading);
 
-function takePicture() {
-  socket.emit('takePicture');
+function count(n, action){
+  countdown.innerHTML = n;
   disableAllButtons();
+  countdown.style.display = 'block';
+
+  var t = setInterval(()=>{
+    countdown.innerHTML = --n;
+  }, 1000);
+
+  setTimeout(()=>{
+    clearInterval(t)
+    action();
+    hideElem(countdown);
+  }, n * 1000);
+}
+
+function takePicture() {
+  count(3, () => {
+    socket.emit('takePicture');
+  });
 }
 
 function takeVideo() {
-  socket.emit('takeVideo');
-  disableAllButtons();
+  count(3, () => {
+    socket.emit('takeVideo');
+  });
 }
 
 twitter.getElementsByTagName('form')[0].addEventListener('submit', (event) => {
