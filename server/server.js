@@ -19,4 +19,7 @@ server.listen(app.get('port'), function () {
 var io = require('socket.io')(server);
 io.on('connection', require('./lib/routes/socket'));
 
+var camera = require('./lib/src/camera');
+camera.makeMasks();
+
 module.exports.app = app;
