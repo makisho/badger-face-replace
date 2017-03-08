@@ -9,6 +9,7 @@ var {
   FPS,
   DETECTION_INTERVAL,
   RESIZE_FACTOR,
+  Y_OFFSET_PERCENT,
   MASK_IMAGE,
   OUTPUT_IMAGE,
   ALGORITHM_PATH
@@ -52,7 +53,6 @@ function createMaskOverlay(mask){
   var maskHeight = mask.height();
   var maskWidth = mask.width();
   var overlayImage = new cv.Matrix(maskHeight, maskWidth);
-
   var channels = mask.split();
   var bgr = [channels[0], channels[1], channels[2]];
   var alpha = channels[3];
@@ -150,7 +150,8 @@ var getImage = (counter, detectedFaces) => {
           faces.map(face => {
             if (face.height > 10) {
               var mask = getMask(face, masks);
-              applyMask(mask, image, face.x * RESIZE_FACTOR, face.y * RESIZE_FACTOR);
+              var resizedY = face.y * RESIZE_FACTOR;
+              applyMask(mask, image, face.x * RESIZE_FACTOR, resizedY - (resizedY * Y_OFFSET_PERCENT));
             }
           });
           resolve({image, counter, detectedFaces});
@@ -190,7 +191,7 @@ var saveGIF = (images, callback) => {
   images.reverse();
   saveFrames(images, GM, images.length);
   var gifPath = path.resolve(__dirname, '../../../client/output/', 'animated.gif');
-  GM.delay(200).write(gifPath, (err) => {
+  GM.write(gifPath, (err) => {
     if (err) console.log("ERROR:", err);
     callback('animated.gif');
   });

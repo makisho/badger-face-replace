@@ -1,12 +1,12 @@
 var camera = require('../src/camera');
 var twitter = require('../src/twitter');
 
-var { FPS } = require('../config/camera');
+var { FPS, GIF_LENGTH } = require('../config/camera');
 
 var imageQueue = [];
 
 function addToQueue(item) {
-  if (imageQueue.length >= 5) imageQueue.shift();
+  if (imageQueue.length >= FPS * GIF_LENGTH) imageQueue.shift();
   imageQueue.push(item);
 }
 
@@ -41,11 +41,17 @@ module.exports = function (socket) {
         camera.stop();
         if (imageQueue.length > 0) {
           socket.emit('isLoading');
-          camera.saveGIF(imageQueue, (imgPath) => {
+
+          var gifQueue = [];
+          imageQueue.map((frame, i) => {
+            if (i % 2 === 1) gifQueue.push(frame);
+          });
+
+          camera.saveGIF(gifQueue, (imgPath) => {
             socket.emit('showImage', { imgPath });
           });
         }
-      }, 1000 / FPS * 5);
+      }, GIF_LENGTH * 1000);
     } else {
       console.log("Error: camera is not running");
     }
