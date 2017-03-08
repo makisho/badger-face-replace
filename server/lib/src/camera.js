@@ -76,6 +76,7 @@ function createMaskOverlay(mask){
 }
 
 function makeMasks(maskImg, maskSizeRatio) {
+  console.log('making masks');
   var maskOverlay = createMaskOverlay(maskImg)
   for (var i = 10; i < CAM_WIDTH; i+= 10) {
     var resizedOverlay = maskOverlay.overlayImage.clone();
@@ -135,23 +136,24 @@ var getImage = (counter, detectedFaces) => {
       newImage.resize(image.width()/RESIZE_FACTOR, image.height()/RESIZE_FACTOR);
 
       newImage.detectObject(ALGORITHM_PATH, {}, function(err, faces) {
-        if (err) throw err;
-
-        counter++;
-        if (counter >= 1) {
-          detectedFaces = faces;
-          counter = 0;
-        }
-
-        faces = detectedFaces || faces;
-        faces.map(face => {
-          if (face.height > 10) {
-            var mask = getMask(face, masks);
-            applyMask(mask, image, face.x * RESIZE_FACTOR, face.y * RESIZE_FACTOR);
+        if (!err){
+          counter++;
+          if (counter >= 1) {
+            detectedFaces = faces;
+            counter = 0;
           }
-        });
 
-        resolve({image, counter, detectedFaces});
+          faces = detectedFaces || faces;
+          faces.map(face => {
+            if (face.height > 10) {
+              var mask = getMask(face, masks);
+              applyMask(mask, image, face.x * RESIZE_FACTOR, face.y * RESIZE_FACTOR);
+            }
+          });
+          resolve({image, counter, detectedFaces});
+        } else {
+          console.log(err);
+        }
       });
     });
   });
