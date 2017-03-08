@@ -62,8 +62,8 @@ function createMaskOverlay(mask){
   alphaMask.bitwiseNot(alphaMask);
 
   overlayImage.merge(bgr);
-  for( x = 0; x < maskHeight; x++) {
-    for (y = 0; y < maskWidth; y++) {
+  for( x = 0; x < maskWidth; x++) {
+    for (y = 0; y < maskHeight; y++) {
       overlayImage.pixel(y,x,mergeMul(overlayImage.pixel(y,x), alpha.pixel(y,x)));
     }
   }
