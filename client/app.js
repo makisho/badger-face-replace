@@ -3,7 +3,9 @@ var socket = io.connect('http://localhost');
 var canvas = document.getElementById('canvas-video');
 var resultImg = document.getElementById('result-img');
 var loadingImg = document.getElementById('loading');
-var tweet = document.getElementById('twitter');
+var tweet = document.getElementById('tweet-submit');
+var tweetConfirmation = document.getElementById('tweet-confirmation')
+var tweetSpinner = document.getElementById('tweet-spinner');
 var countdown = document.getElementById('countdown');
 
 var startButton = document.getElementById('start');
@@ -12,6 +14,7 @@ var takeVideoButton = document.getElementById('video');
 
 var context = canvas.getContext('2d');
 var img = new Image();
+var displayedImgPath;
 
 function _arrayBufferToBase64( buffer ) {
     var binary = '';
@@ -45,6 +48,7 @@ function enableButton(button) {
 }
 
 socket.on('showImage', (data) => {
+  displayedImgPath = data.imgPath;
   resultImg.src = '/output/' + data.imgPath + '?' + new Date().getTime();;
 
   showElem(resultImg);
@@ -52,7 +56,7 @@ socket.on('showImage', (data) => {
   hideElem(loadingImg);
 
   enableButton(startButton);
-  showElem(twitter);
+  showElem(tweet);
 });
 
 function disableAllButtons() {
@@ -67,7 +71,9 @@ function startCamera() {
   showElem(canvas);
   hideElem(loadingImg);
   hideElem(resultImg);
-  hideElem(twitter);
+  hideElem(tweet);
+  hideElem(tweetConfirmation);
+  hideElem(tweetSpinner);
 
   disableButton(startButton);
   enableButton(takePictureButton);
@@ -82,9 +88,14 @@ function startLoading() {
 
 socket.on('isLoading', startLoading);
 
+socket.on('tweetSent', () => {
+  hideElem(tweetSpinner);
+  showElem(tweetConfirmation);
+});
+
 function count(n, action){
-  countdown.innerHTML = n;
   disableAllButtons();
+  countdown.innerHTML = n;
   countdown.style.display = 'block';
 
   var t = setInterval(()=>{
@@ -110,9 +121,29 @@ function takeVideo() {
   });
 }
 
-twitter.getElementsByTagName('form')[0].addEventListener('submit', (event) => {
+function areValid(names) {
+  var valid = true;
+  names.split(' ').map(name => {
+    if (name[0] !== '@') valid = false;
+  });
+  return valid;
+}
+
+tweet.addEventListener('submit', (event) => {
   event.preventDefault();
-  socket.emit('tweet', { user: event.target[0].value });
+  hideElem(tweet);
+  showElem(tweetSpinner);
+
+  var userNames = event.target[0].value;
+  if (areValid(userNames)) {
+    socket.emit('tweet', {
+      userNames: userNames,
+      imagePath: displayedImgPath
+    });
+  } else {
+    showElem(tweet);
+    hideElem(tweetSpinner);
+  }
 });
 
 startLoading();

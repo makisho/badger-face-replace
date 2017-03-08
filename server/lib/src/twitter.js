@@ -1,18 +1,35 @@
+var fs = require('fs');
+var path = require('path');
 var Twitter = require('twitter');
 var creds = require('../config/twitter');
 
 var client = new Twitter(creds);
 
-var tweet = (screen_name) => {
-  var params = { screen_name };
-  console.log("tweeting at", screen_name);
-  client.post('statuses/update', { status: screen_name + ' hi!'}, (error, tweet, response) => {
+var makeMedia = (imgPath, callback) => {
+  var newPath = path.resolve(__dirname, '../../../client/output/', imgPath);
+  var media = fs.readFileSync(newPath);
+  client.post('media/upload', { media }, (error, media, response) => {
     if (error) throw error;
-    console.log('Tweet:', tweet);
-    console.log('Response:', tweet);
+    callback(media.media_id_string);
   });
 };
 
+var tweetUser = (screen_name, callback) => (media_id) => {
+  var status = {
+    status: screen_name + ' looking badgery!',
+    media_ids: media_id
+  };
+
+  client.post('statuses/update', status, (error, tweet, response) => {
+    if (error) throw error;
+    callback();
+  });
+};
+
+var postImage = (name, imagePath, callback) => {
+  makeMedia(imagePath, tweetUser(name, callback));
+}
+
 module.exports = {
-  tweet
+  postImage
 };
