@@ -7,6 +7,7 @@ var tweet = document.getElementById('tweet-submit');
 var tweetConfirmation = document.getElementById('tweet-confirmation')
 var tweetSpinner = document.getElementById('tweet-spinner');
 var tweetError = document.getElementById('twitter-error');
+var countdown = document.getElementById('countdown');
 
 var startButton = document.getElementById('start');
 var takePictureButton = document.getElementById('picture');
@@ -95,14 +96,32 @@ socket.on('tweetSent', () => {
   showElem(tweetConfirmation);
 });
 
-function takePicture() {
-  socket.emit('takePicture');
+function count(n, action){
   disableAllButtons();
+  countdown.innerHTML = n;
+  countdown.style.display = 'block';
+
+  var t = setInterval(()=>{
+    countdown.innerHTML = --n;
+  }, 1000);
+
+  setTimeout(()=>{
+    clearInterval(t)
+    action();
+    hideElem(countdown);
+  }, n * 1000);
+}
+
+function takePicture() {
+  count(3, () => {
+    socket.emit('takePicture');
+  });
 }
 
 function takeVideo() {
-  socket.emit('takeVideo');
-  disableAllButtons();
+  count(3, () => {
+    socket.emit('takeVideo');
+  });
 }
 
 socket.on('twitterError', () => {
