@@ -11,17 +11,13 @@ var {
   ALGORITHM_PATH
 } = require('../config/camera');
 
-var camera, maskImg, masks = [];
+var camera, masks = [];
 var IS_RUNNING = false;
 
 var start = () => {
-  camera = new cv.VideoCapture(1);
+  camera = new cv.VideoCapture(0);
   camera.setWidth(CAM_WIDTH);
   camera.setHeight(CAM_HEIGHT);
-
-  cv.readImage(path.resolve(__dirname, '../images/', MASK_IMAGE), (err, mat) => { maskImg = mat; });
-  makeMasks(maskImg, maskImg.height() / maskImg.width());
-
   IS_RUNNING = true;
 };
 
@@ -75,8 +71,12 @@ function createMaskOverlay(mask){
   }
 }
 
-function makeMasks(maskImg, maskSizeRatio) {
+function makeMasks() {
   console.log('making masks');
+  var maskImg;
+  cv.readImage(path.resolve(__dirname, '../images/', MASK_IMAGE), (err, mat) => { maskImg = mat; });
+  var maskSizeRatio = maskImg.height() / maskImg.width();
+
   var maskOverlay = createMaskOverlay(maskImg)
   for (var i = 10; i < CAM_WIDTH; i+= 10) {
     var resizedOverlay = maskOverlay.overlayImage.clone();
@@ -194,6 +194,7 @@ var saveGIF = (images, callback) => {
 };
 
 module.exports = {
+  makeMasks,
   start,
   run,
   stop,
