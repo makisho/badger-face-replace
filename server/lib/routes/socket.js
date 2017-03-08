@@ -50,9 +50,23 @@ module.exports = function (socket) {
     }
   });
 
-  socket.on('tweet', (data) => {
-    twitter.postImage(data.userNames || '@redbadgerteam', data.imagePath, () => {
-      socket.emit('tweetSent');
+  function validateTwitterInput(input) {
+    console.log(input.split(' '));
+    var valid = true;
+    input.split(' ').map(words => {
+      if (words[0] !== '@') valid = false;
     });
+    return valid;
+  }
+
+  socket.on('tweet', (data) => {
+    console.log('Hello:', data);
+    if (data.handles && validateTwitterInput(data.handles)) {
+      twitter.postImage(data.handles, data.imagePath, () => {
+        socket.emit('tweetSent');
+      });
+    } else {
+      socket.emit('twitterError');
+    }
   });
 };

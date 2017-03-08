@@ -51,6 +51,7 @@ button {
   border-radius: 100px;
   background-color: white;
 
+  font-family: 'Bitter', sans-serif;
   font-size: 36px;
   color: #FC1D42;
 }
@@ -66,22 +67,32 @@ button:disabled {
   border: none;
 }
 
-#tweet-submit {
-  border: 2px solid #FC1D42;
-}
-
 #tweet-submit span {
   font-size: 24px;
+  font-weight: 700;
   padding: 15px;
   padding-right: 0;
 }
 
-#tweet-submit input {
-  border: none;
-  font-size: 24px;
-  padding: 15px 10px;
+#tweet-submit .input {
+  font-weight: 400;
   display: inline-block;
   position: relative;
+
+  padding: 15px 10px 6px 10px;
+  max-width: 600px;
+  margin-right: 10px;
+
+  border: none;
+  border-bottom: 2px solid #CCCCCC;
+
+  font-size: 24px;
+  text-align: left;
+}
+
+.input[placeholder]:empty:before {
+  content: attr(placeholder);
+  color: #CCCCCC;
 }
 
 #tweet-submit button {
@@ -94,5 +105,5 @@ button:disabled {
   font-size: 24px;
   color: #F8F8F8;
   background-color: #FC1D42;
-  padding: 15px 20px;
+  padding: 10px 20px;
 }
