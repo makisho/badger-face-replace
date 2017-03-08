@@ -30,6 +30,21 @@ body {
   -webkit-animation-timing-function: linear;
 }
 
+#countdown {
+  bottom: 640px;
+  position: relative;
+  display: none;
+  width: 130px;
+  height: 130px;
+  padding: 36px;
+  margin: auto;
+  border: 15px solid #FC1D42;
+  background-color: white;
+  border-radius: 150px;
+  font-size: 120px;
+  color: #FC1D42;
+}
+
 #canvas-video {
   margin: auto;
   width: 1920px;
