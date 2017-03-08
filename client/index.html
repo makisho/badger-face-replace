@@ -9,7 +9,7 @@
 <body>
   <div class="container center">
     <div id="loading">
-      <img src='Badger.png' />
+      <img src='spinner.gif' />
     </div>
     <img id="result-img">
     <canvas id="canvas-video" width="1920" height="1080"></canvas>
@@ -18,12 +18,16 @@
       <button id="picture" onClick="takePicture()">PHOTO</button>
       <button id="video" onClick="takeVideo()">GIF</button>
     </div>
-    <div id="twitter">
-      <form>
-        <span>TWEET TO:</span>
+    <div class="twitter">
+      <form id="tweet-submit">
+        <span>Tweet it to:</span>
         <input type="text" placeholder="@redbadgerteam" />
-        <button type="submit">SEND</button>
+        <button type="submit">SHARE</button>
       </form>
+      <div id="tweet-spinner">
+        <img src='spinner.gif' />
+      </div>
+      <div id="tweet-confirmation">All done! Enjoy the rest of your conference!</div>
     </div>
   </div>
   <script src="/socket.io/socket.io.js"></script>

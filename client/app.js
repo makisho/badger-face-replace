@@ -3,7 +3,9 @@ var socket = io.connect('http://localhost');
 var canvas = document.getElementById('canvas-video');
 var resultImg = document.getElementById('result-img');
 var loadingImg = document.getElementById('loading');
-var tweet = document.getElementById('twitter');
+var tweet = document.getElementById('tweet-submit');
+var tweetConfirmation = document.getElementById('tweet-confirmation')
+var tweetSpinner = document.getElementById('tweet-spinner');
 
 var startButton = document.getElementById('start');
 var takePictureButton = document.getElementById('picture');
@@ -11,6 +13,7 @@ var takeVideoButton = document.getElementById('video');
 
 var context = canvas.getContext('2d');
 var img = new Image();
+var displayedImgPath;
 
 function _arrayBufferToBase64( buffer ) {
     var binary = '';
@@ -44,6 +47,7 @@ function enableButton(button) {
 }
 
 socket.on('showImage', (data) => {
+  displayedImgPath = data.imgPath;
   resultImg.src = '/output/' + data.imgPath + '?' + new Date().getTime();;
 
   showElem(resultImg);
@@ -51,7 +55,7 @@ socket.on('showImage', (data) => {
   hideElem(loadingImg);
 
   enableButton(startButton);
-  showElem(twitter);
+  showElem(tweet);
 });
 
 function disableAllButtons() {
@@ -66,7 +70,9 @@ function startCamera() {
   showElem(canvas);
   hideElem(loadingImg);
   hideElem(resultImg);
-  hideElem(twitter);
+  hideElem(tweet);
+  hideElem(tweetConfirmation);
+  hideElem(tweetSpinner);
 
   disableButton(startButton);
   enableButton(takePictureButton);
@@ -81,6 +87,11 @@ function startLoading() {
 
 socket.on('isLoading', startLoading);
 
+socket.on('tweetSent', () => {
+  hideElem(tweetSpinner);
+  showElem(tweetConfirmation);
+});
+
 function takePicture() {
   socket.emit('takePicture');
   disableAllButtons();
@@ -91,9 +102,14 @@ function takeVideo() {
   disableAllButtons();
 }
 
-twitter.getElementsByTagName('form')[0].addEventListener('submit', (event) => {
+tweet.addEventListener('submit', (event) => {
   event.preventDefault();
-  socket.emit('tweet', { user: event.target[0].value });
+  hideElem(tweet);
+  showElem(tweetSpinner);
+  socket.emit('tweet', {
+    user: event.target[0].value,
+    imagePath: displayedImgPath
+  });
 });
 
 startLoading();

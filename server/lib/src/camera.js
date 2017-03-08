@@ -15,7 +15,7 @@ var camera, maskImg, masks = [];
 var IS_RUNNING = false;
 
 var start = () => {
-  camera = new cv.VideoCapture(0);
+  camera = new cv.VideoCapture(1);
   camera.setWidth(CAM_WIDTH);
   camera.setHeight(CAM_HEIGHT);
 
