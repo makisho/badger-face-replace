@@ -1,7 +1,8 @@
 var camera = require('../src/camera');
 var twitter = require('../src/twitter');
 
-var FPS = 5;
+var { FPS } = require('../config/camera');
+
 var imageQueue = [];
 
 function addToQueue(item) {
@@ -11,7 +12,7 @@ function addToQueue(item) {
 
 function runCamera(socket) {
   camera.start();
-  return camera.run(FPS, (image) => {
+  return camera.run((image) => {
     addToQueue(image);
     socket.emit('frame', { buffer: image.toBuffer() });
   });

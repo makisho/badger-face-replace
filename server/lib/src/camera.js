@@ -3,8 +3,11 @@ var path = require('path');
 var gm = require('gm').subClass({ imageMagick: true });
 
 var {
+  DEVICE,
   CAM_WIDTH,
   CAM_HEIGHT,
+  FPS,
+  DETECTION_INTERVAL,
   RESIZE_FACTOR,
   MASK_IMAGE,
   OUTPUT_IMAGE,
@@ -15,7 +18,7 @@ var camera, masks = [];
 var IS_RUNNING = false;
 
 var start = () => {
-  camera = new cv.VideoCapture(0);
+  camera = new cv.VideoCapture(DEVICE);
   camera.setWidth(CAM_WIDTH);
   camera.setHeight(CAM_HEIGHT);
   IS_RUNNING = true;
@@ -138,7 +141,7 @@ var getImage = (counter, detectedFaces) => {
       newImage.detectObject(ALGORITHM_PATH, {}, function(err, faces) {
         if (!err){
           counter++;
-          if (counter >= 1) {
+          if (counter >= DETECTION_INTERVAL - 1) {
             detectedFaces = faces;
             counter = 0;
           }
@@ -159,7 +162,7 @@ var getImage = (counter, detectedFaces) => {
   });
 }
 
-var run = (fps, callback) => {
+var run = (callback) => {
   var counter = 0;
   var detectedFaces = [];
   return setInterval(() => {
@@ -170,7 +173,7 @@ var run = (fps, callback) => {
     }).catch(err => {
       console.log("Error:", err);
     });
-  }, 1000 / fps);
+  }, 1000 / FPS);
 };
 
 var saveFrames = (images, gm, offset) => {
