@@ -30,12 +30,6 @@ var stop = () => {
   IS_RUNNING = false;
 };
 
-function mergeAdd(pixel_a, pixel_b){
-  pixel_a[0] = pixel_a[0] + pixel_b[0];
-  pixel_a[1] = pixel_a[1] + pixel_b[1];
-  pixel_a[2] = pixel_a[2] + pixel_b[2];
-  return pixel_a;
-}
 function mergeMul(pixel_a, pixel_b){
   pixel_a[0] = pixel_a[0] * pixel_b[0] / 255;
   pixel_a[1] = pixel_a[1] * pixel_b[1] / 255;
@@ -69,8 +63,8 @@ function createMaskOverlay(mask){
   }
 
   return {
-    overlayImage: overlayImage,
-    alphaMask: alphaMask,
+    overlayImage,
+    alphaMask,
   }
 }
 
@@ -86,30 +80,27 @@ function makeMasks() {
     var resizedMask = maskOverlay.alphaMask.clone();
     resizedOverlay.resize(i, i * maskSizeRatio);
     resizedMask.resize(i, i * maskSizeRatio);
+    var maskBuffer = [];
+    for( x = 0; x < i; x++) {
+      for (y = 0; y < resizedOverlay.height(); y++) {
+        var alpha_pixel = resizedMask.pixel(y,x);
+        if(!(alpha_pixel[0] || alpha_pixel[1] || alpha_pixel[2])) maskBuffer.push([x,y,resizedOverlay.pixel(y,x)]);
+      }
+    }
 
     masks.push({
-      overlayImage: resizedOverlay,
-      alphaMask: resizedMask,
+      maskBuffer,
       height: resizedOverlay.height(),
       width: i
     });
   }
+  console.log('done making masks');
 }
 
 function overlayImages(base, mask, offset_x, offset_y){
-  for(x = 1; x < mask.width; x++){
-    for( y = 1; y < mask.height; y++){
-      base.pixel(y + offset_y,
-                 x + offset_x,
-                 mergeAdd(
-                   mergeMul(
-                     base.pixel(y + offset_y, x + offset_x),
-                     mask.alphaMask.pixel(y, x)
-                   ),
-                   mask.overlayImage.pixel(y,x)
-                 ))
-    }
-  }
+  mask.maskBuffer.map(mask => {
+      base.pixel(mask[1] + offset_y, mask[0] + offset_x, mask[2]);
+    });
 }
 
 function applyMask(mask, image, x, y) {
