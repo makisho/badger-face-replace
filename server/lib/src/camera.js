@@ -17,6 +17,7 @@ var {
 } = require('../config/camera');
 
 var camera, masks = [];
+var redBadger;
 var IS_RUNNING = false;
 
 var start = () => {
@@ -46,6 +47,7 @@ function mergeMul(pixel_a, pixel_b){
 
 var saveImage = (image, callback) => {
   var imgPath = path.resolve(__dirname, '../../../client/output', OUTPUT_IMAGE);
+  redBadger.copyTo(image,0,0);
   image.save(imgPath);
   callback(OUTPUT_IMAGE);
 }
@@ -77,6 +79,8 @@ function createMaskOverlay(mask){
 
 function makeMasks() {
   console.log('making masks');
+  cv.readImage(path.resolve(__dirname, '../images/', 'red_badger.jpg'), (err, mat) => { redBadger = mat; });
+  if(CAM_WIDTH < 800) redBadger.resize(redBadger.width()/2,redBadger.height()/2);
   var maskImg;
   cv.readImage(path.resolve(__dirname, '../images/', MASK_IMAGE), (err, mat) => { maskImg = mat; });
   var maskSizeRatio = maskImg.height() / maskImg.width();
@@ -183,6 +187,7 @@ var run = (callback) => {
 
 var saveFrames = (images, gm, offset) => {
   images.map((image, k) => {
+    redBadger.copyTo(image,0,0);
     var framePath = path.resolve(__dirname, '../output/', `output-00${offset + k}.jpg`);
     image.save(path.resolve(framePath));
     gm.in(framePath);
