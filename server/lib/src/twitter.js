@@ -1,7 +1,7 @@
 var fs = require('fs');
 var path = require('path');
 var Twitter = require('twitter');
-var creds = require('../config/twitter');
+var {creds , message} = require('../config/twitter');
 
 var client = new Twitter(creds);
 
@@ -16,7 +16,7 @@ var makeMedia = (imgPath, callback) => {
 
 var tweetUser = (screen_name, callback) => (media_id) => {
   var status = {
-    status: screen_name + ' looking badgery!',
+    status: screen_name + ' ' + message,
     media_ids: media_id
   };
 
