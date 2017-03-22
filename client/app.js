@@ -1,5 +1,6 @@
 var socket = io.connect('http://localhost');
 
+var container = document.getElementById('container');
 var canvas = document.getElementById('canvas-video');
 var resultImg = document.getElementById('result-img');
 var loadingImg = document.getElementById('loading');
@@ -51,13 +52,14 @@ function enableButton(button) {
 socket.on('showImage', (data) => {
   displayedImgPath = data.imgPath;
   resultImg.src = '/output/' + data.imgPath + '?' + new Date().getTime();;
-
+  container.className = 'container-result';
   showElem(resultImg);
   hideElem(canvas);
   hideElem(loadingImg);
 
   enableButton(startButton);
   showElem(tweet);
+
 });
 
 function disableAllButtons() {
@@ -68,7 +70,7 @@ function disableAllButtons() {
 
 function startCamera() {
   socket.emit('startCamera');
-
+  container.className = '';
   showElem(canvas);
   hideElem(loadingImg);
   hideElem(resultImg);

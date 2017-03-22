@@ -9,6 +9,7 @@ var {
   FPS,
   DETECTION_INTERVAL,
   RESIZE_FACTOR,
+  WIDTH_OFFSET_PERCENT,
   Y_OFFSET_PERCENT,
   MASK_IMAGE,
   OUTPUT_IMAGE,
@@ -16,6 +17,7 @@ var {
 } = require('../config/camera');
 
 var camera, masks = [];
+var redBadger;
 var IS_RUNNING = false;
 
 var start = () => {
@@ -37,14 +39,15 @@ function mergeAdd(pixel_a, pixel_b){
   return pixel_a;
 }
 function mergeMul(pixel_a, pixel_b){
-  pixel_a[0] = pixel_a[0] * pixel_b[0] / 255;
-  pixel_a[1] = pixel_a[1] * pixel_b[1] / 255;
-  pixel_a[2] = pixel_a[2] * pixel_b[2] / 255;
+  pixel_a[0] = Math.floor(pixel_a[0] * pixel_b[0] / 255);
+  pixel_a[1] = Math.floor(pixel_a[1] * pixel_b[1] / 255);
+  pixel_a[2] = Math.floor(pixel_a[2] * pixel_b[2] / 255);
   return pixel_a;
 }
 
 var saveImage = (image, callback) => {
   var imgPath = path.resolve(__dirname, '../../../client/output', OUTPUT_IMAGE);
+  redBadger.copyTo(image,0,0);
   image.save(imgPath);
   callback(OUTPUT_IMAGE);
 }
@@ -76,6 +79,8 @@ function createMaskOverlay(mask){
 
 function makeMasks() {
   console.log('making masks');
+  cv.readImage(path.resolve(__dirname, '../images/', 'red_badger.jpg'), (err, mat) => { redBadger = mat; });
+  if(CAM_WIDTH < 800) redBadger.resize(redBadger.width()/2,redBadger.height()/2);
   var maskImg;
   cv.readImage(path.resolve(__dirname, '../images/', MASK_IMAGE), (err, mat) => { maskImg = mat; });
   var maskSizeRatio = maskImg.height() / maskImg.width();
@@ -113,7 +118,7 @@ function overlayImages(base, mask, offset_x, offset_y){
 }
 
 function applyMask(mask, image, x, y) {
-  if ((y + mask.height < CAM_HEIGHT) && (x + mask.width < CAM_WIDTH)) {
+  if (y > 0 && (y + mask.height < CAM_HEIGHT) && (x + mask.width < CAM_WIDTH)) {
     overlayImages(image, mask, x, y);
     return true;
   }
@@ -121,7 +126,9 @@ function applyMask(mask, image, x, y) {
 }
 
 function getMask(face, masks) {
-  var maskIndex = Math.floor(face.width * RESIZE_FACTOR / 10) - 1;
+  var width = face.width * RESIZE_FACTOR;
+  width = width + width * WIDTH_OFFSET_PERCENT * 2;
+  var maskIndex = Math.floor(width / 10) - 1;
   if (maskIndex < 0) maskIndex = 0;
   return masks[maskIndex];
 }
@@ -151,7 +158,8 @@ var getImage = (counter, detectedFaces) => {
             if (face.height > 10) {
               var mask = getMask(face, masks);
               var resizedY = face.y * RESIZE_FACTOR;
-              applyMask(mask, image, face.x * RESIZE_FACTOR, resizedY - (resizedY * Y_OFFSET_PERCENT));
+              var resizedX = face.x * RESIZE_FACTOR;
+              applyMask(mask, image, resizedX - (face.width * RESIZE_FACTOR * WIDTH_OFFSET_PERCENT), resizedY - (face.height * RESIZE_FACTOR * Y_OFFSET_PERCENT));
             }
           });
           resolve({image, counter, detectedFaces});
@@ -179,6 +187,7 @@ var run = (callback) => {
 
 var saveFrames = (images, gm, offset) => {
   images.map((image, k) => {
+    redBadger.copyTo(image,0,0);
     var framePath = path.resolve(__dirname, '../output/', `output-00${offset + k}.jpg`);
     image.save(path.resolve(framePath));
     gm.in(framePath);

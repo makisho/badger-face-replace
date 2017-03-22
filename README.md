@@ -18,7 +18,7 @@ Replace your face with badgers (or whatever image you upload). Based on the [rea
 
 ## Replacing the mask image
 
-* Add your image (in JPEG format) to the `server/lib/images` directory
+* Add your image (in PNG format) to the `server/lib/images` directory
 * Update the `MASK_IMAGE` constant in `server/lib/config/camera.js`
 
 ## Running the demo

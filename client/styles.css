@@ -1,9 +1,21 @@
+* { margin:0; padding:0; }
+
 body {
-  font-family: 'Bitter', sans-serif;
+  font-family: 'ProximaNova-Bold', sans-serif;
+  width: 100%;
+  height: 100%;
+  background-color: #212121;
+  color: #f9f9f9;
 }
 
-.container {
-  padding-top: 50px;
+#container {
+  width: 100%;
+  height: 100%;
+}
+
+.container-result {
+  text-align: center;
+  margin-top: 50px;
 }
 
 .center {
@@ -11,36 +23,38 @@ body {
 }
 
 #loading {
-  width: 1920px;
-  height: 1080px;
+  width: 100%;
+  height: 100%;
 }
 
 #loading img {
-  height: 20%;
+  height: 50px;
   position: relative;
-  top: 30%;
+  top: 600px;
+}
+
+.countdown-container{
+  position: absolute;
+  top: 40%;
+  width: 100%;
 }
 
 #countdown {
-  bottom: 640px;
-  position: relative;
   display: none;
-  width: 130px;
-  height: 130px;
+  width: 120px;
+  height: 120px;
   padding: 36px;
   margin: auto;
-  border: 15px solid #FC1D42;
-  background-color: white;
+  background-color: #F9F9F9;
   border-radius: 150px;
-  font-size: 120px;
+  font-size: 112px;
   color: #FC1D42;
 }
 
 #canvas-video {
-  margin: auto;
-  width: 1920px;
-  height: 1080px;
-  border: 1px solid #ccc;
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 #result-img {
@@ -52,32 +66,44 @@ body {
 
 #control-panel {
   margin: auto;
-  position: relative;
-  bottom: 150px;
+  position: absolute;
+  bottom: 0px;
+  width: 100%;
 }
 
 button {
-  width: 200px;
-  height: 200px;
+  width: 130px;
+  height: 130px;
   padding: 10px;
   margin: 25px;
 
-  border: 15px solid #FC1D42;
-  border-radius: 100px;
-  background-color: white;
+  border: 5px solid #FC1D42;
+  border-radius: 90px;
+  background-color: #F9F9F9;
 
-  font-family: 'Bitter', sans-serif;
-  font-size: 36px;
+  font-family: 'ProximaNova-Bold', sans-serif;
+  font-size: 24px;
   color: #FC1D42;
 }
+
+button:hover {
+  background-color: #FC1D42;
+  color: #F9F9F9;
+}
+
 
 button:disabled {
   opacity: 0.2;
 }
 
-.twitter {
+.start-camera {
   position: relative;
   bottom: 100px;
+}
+
+.twitter {
+  position: relative;
+  bottom: 50px;
   font-size: 24px;
   border: none;
 }
@@ -87,19 +113,19 @@ button:disabled {
   font-weight: 700;
   padding: 15px;
   padding-right: 0;
+  color: #F8F8F8;
 }
 
 #tweet-submit .input {
-  font-weight: 400;
   display: inline-block;
   position: relative;
-
-  padding: 15px 10px 6px 10px;
+  color: #212121;
+  background-color: #f9f9f9;
+  padding: 10px;
+  min-width: 300px;
   max-width: 600px;
-  margin-right: 10px;
-
-  border: none;
-  border-bottom: 2px solid #CCCCCC;
+  margin-left: 5px;
+  margin-right: -6px;
 
   font-size: 24px;
   text-align: left;
@@ -107,7 +133,7 @@ button:disabled {
 
 .input[placeholder]:empty:before {
   content: attr(placeholder);
-  color: #CCCCCC;
+  color: #999999;
 }
 
 #tweet-submit button {
@@ -118,7 +144,11 @@ button:disabled {
   margin: 0;
 
   font-size: 24px;
-  color: #F8F8F8;
+  color: #F9F9F9;
   background-color: #FC1D42;
   padding: 10px 20px;
+}
+
+#tweet-spinner img {
+  height: 50px;
 }
