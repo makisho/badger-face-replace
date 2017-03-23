@@ -7,7 +7,7 @@ var {
   CAM_WIDTH,
   CAM_HEIGHT,
   FPS,
-  DETECTION_INTERVAL,
+  NO_DETECTION_INTERVAL,
   RESIZE_FACTOR,
   WIDTH_OFFSET_PERCENT,
   Y_OFFSET_PERCENT,
@@ -144,28 +144,20 @@ var getImage = (counter, detectedFaces) => {
       var newImage = image.copy();
       newImage.resize(image.width()/RESIZE_FACTOR, image.height()/RESIZE_FACTOR);
 
-      newImage.detectObject(ALGORITHM_PATH, {}, function(err, faces) {
-        if (!err){
-          counter++;
-          if (counter >= DETECTION_INTERVAL - 1) {
-            detectedFaces = faces;
-            counter = 0;
+      counter++;
+      if (counter <= NO_DETECTION_INTERVAL) {
+        newImage.detectObject(ALGORITHM_PATH, {}, function(err, faces) {
+          if (!err){
+            detectedFaces = faces || detectedFaces;
+            resolve({image, counter, detectedFaces});
+          } else {
+            console.log(err);
           }
-
-          faces = detectedFaces || faces;
-          faces.map(face => {
-            if (face.height > 10) {
-              var mask = getMask(face, masks);
-              var resizedY = face.y * RESIZE_FACTOR;
-              var resizedX = face.x * RESIZE_FACTOR;
-              applyMask(mask, image, resizedX - (face.width * RESIZE_FACTOR * WIDTH_OFFSET_PERCENT), resizedY - (face.height * RESIZE_FACTOR * Y_OFFSET_PERCENT));
-            }
-          });
-          resolve({image, counter, detectedFaces});
-        } else {
-          console.log(err);
-        }
-      });
+        });
+      } else {
+        counter = 0;
+        resolve({image, counter, detectedFaces});
+      }
     });
   });
 }
@@ -180,6 +172,14 @@ var run = (callback) => {
       getImage(counter, detectedFaces).then(result => {
         counter = result.counter;
         detectedFaces = result.detectedFaces;
+        detectedFaces.map(face => {
+          if (face.height > 10) {
+            var mask = getMask(face, masks);
+            var resizedY = face.y * RESIZE_FACTOR;
+            var resizedX = face.x * RESIZE_FACTOR;
+            applyMask(mask, result.image, resizedX - (face.width * RESIZE_FACTOR * WIDTH_OFFSET_PERCENT), resizedY - (face.height * RESIZE_FACTOR * Y_OFFSET_PERCENT));
+          }
+        });
         callback(result.image);
         busy = false;
       }).catch(err => {
