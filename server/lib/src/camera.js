@@ -174,14 +174,20 @@ var getImage = (counter, detectedFaces) => {
 var run = (callback) => {
   var counter = 0;
   var detectedFaces = [];
+  var busy = false;
   return setInterval(() => {
-    getImage(counter, detectedFaces).then(result => {
-      counter = result.counter;
-      detectedFaces = result.detectedFaces;
-      callback(result.image);
-    }).catch(err => {
-      console.log("Error:", err);
-    });
+    if (!busy) {
+      busy = true;
+      getImage(counter, detectedFaces).then(result => {
+        counter = result.counter;
+        detectedFaces = result.detectedFaces;
+        callback(result.image);
+        busy = false;
+      }).catch(err => {
+        console.log("Error:", err);
+        busy = false;
+      });
+    }
   }, 1000 / FPS);
 };
 
