@@ -28,7 +28,6 @@ var start = () => {
 };
 
 var stop = () => {
-  camera.release();
   IS_RUNNING = false;
 };
 

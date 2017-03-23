@@ -67,7 +67,6 @@ module.exports = function (socket) {
   }
 
   socket.on('tweet', (data) => {
-    console.log('Hello:', data);
     if (data.handles && validateTwitterInput(data.handles)) {
       twitter.postImage(data.handles, data.imagePath, () => {
         socket.emit('tweetSent');
